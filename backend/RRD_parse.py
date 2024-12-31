@@ -88,6 +88,7 @@ class RRD_parser:
                                         shell=True
                                         ).decode('utf-8')
         json_result = json.dumps(xmltodict.parse(result), indent=4)
+        print(json_result)
         # replace rrdtool v key with the ds
         replace_val = "\""+ds.lower()+"\": "
         temp_result_one = re.sub("\"v\": ",  replace_val, json_result)
