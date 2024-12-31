@@ -1,15 +1,17 @@
+import datetime
+import json
+import pytz
+import re
 import subprocess
 import xmltodict
-import json
-import re
+
 from collections import defaultdict
 from itertools import chain
-import datetime
 
 
 class RRD_parser:
 
-    def __init__(self, rrd_file=None, start_time=None, end_time=None):
+    def __init__(self, rrd_file=None, start_time=None, end_time=None, rrd_timezone='UTC'):
         self.rrd_file = rrd_file
         self.ds = None
         self.step = None
@@ -17,8 +19,10 @@ class RRD_parser:
         self.check_dependc()
         self.start_time = start_time
         self.end_time = end_time
+        self.rrd_timezone = rrd_timezone
 
     def check_dependc(self):
+        """ checks rrdtool is installed and version """
         result = subprocess.check_output(
                                         "rrdtool --version",
                                         shell=True
@@ -61,7 +65,11 @@ class RRD_parser:
         
         rrd_xport_command = f"rrdtool xport --step {self.step} DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime"
         if self.start_time:
-            rrd_xport_command = f"rrdtool xport DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime --start {self.start_time} --end {self.end_time}"
+            start_time_local = pytz.utc.localize(datetime.datetime.fromisoformat(self.start_time)).astimezone(pytz.timezone(self.rrd_timezone))
+            start_time_local = start_time_local.strftime("%s")  # Convert to epoch time
+            end_time_local = pytz.utc.localize(datetime.datetime.fromisoformat(self.end_time)).astimezone(pytz.timezone(self.rrd_timezone))
+            end_time_local = end_time_local.strftime("%s")  # Convert to epoch time
+            rrd_xport_command = f"rrdtool xport DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime --start {start_time_local} --end {end_time_local}"
         result = subprocess.check_output(
                                         rrd_xport_command,
                                         shell=True
@@ -78,9 +86,12 @@ class RRD_parser:
         # convert timezones and floats
         for count, temp_obj in enumerate(payload["data"]):
             epoch_time = temp_obj["t"]
-            utc_time = datetime.datetime.fromtimestamp(
-                int(epoch_time)
-                ).strftime(self.time_format)
+            # Convert epoch time to datetime object in rrd_timezone
+            local_datetime = datetime.datetime.fromtimestamp(int(epoch_time), pytz.timezone(self.rrd_timezone)) 
+            # Convert local datetime to UTC
+            utc_datetime = local_datetime.astimezone(pytz.utc)
+            # Format UTC datetime 
+            utc_time = utc_datetime.strftime(self.time_format) 
             payload["data"][count]["t"] = utc_time
             for key in payload["data"][count]:
                 temp_val = ""
