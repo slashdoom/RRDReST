@@ -65,11 +65,21 @@ class RRD_parser:
         
         rrd_xport_command = f"rrdtool xport --step {self.step} DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime"
         if self.start_time:
-            start_time_local = pytz.utc.localize(datetime.datetime.fromisoformat(self.start_time)).astimezone(pytz.timezone(self.rrd_timezone))
-            start_time_local = start_time_local.strftime("%s")  # Convert to epoch time
-            end_time_local = pytz.utc.localize(datetime.datetime.fromisoformat(self.end_time)).astimezone(pytz.timezone(self.rrd_timezone))
-            end_time_local = end_time_local.strftime("%s")  # Convert to epoch time
-            rrd_xport_command = f"rrdtool xport DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime --start {start_time_local} --end {end_time_local}"
+            # Convert start_time epoch time to UTC datetime
+            start_time_utc = datetime.datetime.fromtimestamp(self.start_time, tz=pytz.utc) 
+            # Convert start_time UTC datetime to specified timezone
+            start_time_rrd = start_time_utc.astimezone(pytz.timezone(self.rrd_timezone))
+            # Convert start_time back to epoch time
+            start_time_rrd = start_time_rrd.strftime("%s")  
+
+            # Convert end_time epoch time to UTC datetime
+            end_time_utc = datetime.datetime.fromtimestamp(self.start_time, tz=pytz.utc)
+            # Convert start_time UTC datetime to specified timezone
+            end_time_rrd = end_time_utc.astimezone(pytz.timezone(self.rrd_timezone))
+            # Convert end_time back to epoch time
+            end_time_rrd = end_time_rrd.strftime("%s") 
+            
+            rrd_xport_command = f"rrdtool xport DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime --start {start_time_rrd} --end {end_time_rrd}"
         result = subprocess.check_output(
                                         rrd_xport_command,
                                         shell=True
@@ -87,9 +97,9 @@ class RRD_parser:
         for count, temp_obj in enumerate(payload["data"]):
             epoch_time = temp_obj["t"]
             # Convert epoch time to datetime object in rrd_timezone
-            local_datetime = datetime.datetime.fromtimestamp(int(epoch_time), pytz.timezone(self.rrd_timezone)) 
+            rrd_datetime = datetime.datetime.fromtimestamp(int(epoch_time), pytz.timezone(self.rrd_timezone)) 
             # Convert local datetime to UTC
-            utc_datetime = local_datetime.astimezone(pytz.utc)
+            utc_datetime = rrd_datetime.astimezone(pytz.utc)
             # Format UTC datetime 
             utc_time = utc_datetime.strftime(self.time_format) 
             payload["data"][count]["t"] = utc_time
