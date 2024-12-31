@@ -74,7 +74,6 @@ class RRD_parser:
             start_time_rrd = start_time_utc.astimezone(pytz.timezone(self.rrd_timezone))
             # Convert start_time back to epoch time
             start_time_rrd = start_time_rrd.strftime("%s")
-            print(start_time_rrd)
 
             # Convert end_time epoch time to UTC datetime
             end_time_utc = datetime.datetime.fromtimestamp(self.end_time, tz=pytz.utc)
@@ -82,18 +81,19 @@ class RRD_parser:
             end_time_rrd = end_time_utc.astimezone(pytz.timezone(self.rrd_timezone))
             # Convert end_time back to epoch time
             end_time_rrd = end_time_rrd.strftime("%s")
-            print(end_time_rrd)
             
             rrd_xport_command = f"rrdtool xport DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime --start {start_time_rrd} --end {end_time_rrd}"
+
         result = subprocess.check_output(
                                         rrd_xport_command,
                                         shell=True
                                         ).decode('utf-8')
         json_result = json.dumps(xmltodict.parse(result), indent=4)
-        print(json_result)
+
         # replace rrdtool v key with the ds
         replace_val = "\""+ds.lower()+"\": "
         temp_result_one = re.sub("\"v\": ",  replace_val, json_result)
+        
         return json.loads(temp_result_one)
 
     def cleanup_payload(self, payload):
@@ -147,32 +147,22 @@ class RRD_parser:
         collector = defaultdict(dict)
 
         for d in DS_VALUES:
-            print(d)
             r = self.get_rrd_json(ds=d)
-            print(r["xport"]["data"])
-            print(int(r["xport"]["meta"]["start"]))
             master_result["meta"]["start"] = datetime.datetime.fromtimestamp(
                 int(r["xport"]["meta"]["start"])
                 ).strftime(self.time_format)
-            print(master_result["meta"]["start"])
             master_result["meta"]["step"] = r["xport"]["meta"]["step"]
-            print(int(r["xport"]["meta"]["end"]))
             master_result["meta"]["end"] = datetime.datetime.fromtimestamp(
                 int(r["xport"]["meta"]["end"])
                 ).strftime(self.time_format)
-            print(master_result["meta"]["end"])
             master_result["meta"]["rows"] = 0
             master_result["meta"]["data_sources"].append(
                 r["xport"]["meta"]["legend"]["entry"]
                 )
 
-            print(master_result["data"])
-            print(r["xport"]["data"]["row"])
             for collectible in chain(
                 master_result["data"], r["xport"]["data"]["row"]
                                     ):
-                print(collectible)
-                print(collectible["t"])
                 collector[collectible["t"]].update(collectible.items())
 
         # combine objs, add row_count
