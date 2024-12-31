@@ -146,6 +146,7 @@ class RRD_parser:
         for d in DS_VALUES:
             print(d)
             r = self.get_rrd_json(ds=d)
+            print(r["xport"]["data"])
             print(int(r["xport"]["meta"]["start"]))
             master_result["meta"]["start"] = datetime.datetime.fromtimestamp(
                 int(r["xport"]["meta"]["start"])
