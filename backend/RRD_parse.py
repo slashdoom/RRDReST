@@ -158,6 +158,7 @@ class RRD_parser:
                 )
 
             for collectible in chain(
+                print(collectible)
                 master_result["data"], r["xport"]["data"]["row"]
                                     ):
                 collector[collectible["t"]].update(collectible.items())
