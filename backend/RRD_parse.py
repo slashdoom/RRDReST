@@ -73,14 +73,16 @@ class RRD_parser:
             # Convert start_time UTC datetime to specified timezone
             start_time_rrd = start_time_utc.astimezone(pytz.timezone(self.rrd_timezone))
             # Convert start_time back to epoch time
-            start_time_rrd = start_time_rrd.strftime("%s")  
+            start_time_rrd = start_time_rrd.strftime("%s")
+            print(start_time_rrd)
 
             # Convert end_time epoch time to UTC datetime
             end_time_utc = datetime.datetime.fromtimestamp(self.start_time, tz=pytz.utc)
             # Convert start_time UTC datetime to specified timezone
             end_time_rrd = end_time_utc.astimezone(pytz.timezone(self.rrd_timezone))
             # Convert end_time back to epoch time
-            end_time_rrd = end_time_rrd.strftime("%s") 
+            end_time_rrd = end_time_rrd.strftime("%s")
+            print(end_time_rrd)
             
             rrd_xport_command = f"rrdtool xport DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime --start {start_time_rrd} --end {end_time_rrd}"
         result = subprocess.check_output(
@@ -92,7 +94,6 @@ class RRD_parser:
         # replace rrdtool v key with the ds
         replace_val = "\""+ds.lower()+"\": "
         temp_result_one = re.sub("\"v\": ",  replace_val, json_result)
-        print(json.loads(temp_result_one))
         return json.loads(temp_result_one)
 
     def cleanup_payload(self, payload):
