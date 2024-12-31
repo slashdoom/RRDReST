@@ -144,14 +144,19 @@ class RRD_parser:
         collector = defaultdict(dict)
 
         for d in DS_VALUES:
+            print(d)
             r = self.get_rrd_json(ds=d)
+            print(int(r["xport"]["meta"]["start"]))
             master_result["meta"]["start"] = datetime.datetime.fromtimestamp(
                 int(r["xport"]["meta"]["start"])
                 ).strftime(self.time_format)
+            print(master_result["meta"]["start"])
             master_result["meta"]["step"] = r["xport"]["meta"]["step"]
+            print(int(r["xport"]["meta"]["end"]))
             master_result["meta"]["end"] = datetime.datetime.fromtimestamp(
                 int(r["xport"]["meta"]["end"])
                 ).strftime(self.time_format)
+            print(master_result["meta"]["end"])
             master_result["meta"]["rows"] = 0
             master_result["meta"]["data_sources"].append(
                 r["xport"]["meta"]["legend"]["entry"]
