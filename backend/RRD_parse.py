@@ -77,7 +77,7 @@ class RRD_parser:
             print(start_time_rrd)
 
             # Convert end_time epoch time to UTC datetime
-            end_time_utc = datetime.datetime.fromtimestamp(self.start_time, tz=pytz.utc)
+            end_time_utc = datetime.datetime.fromtimestamp(self.end_time, tz=pytz.utc)
             # Convert start_time UTC datetime to specified timezone
             end_time_rrd = end_time_utc.astimezone(pytz.timezone(self.rrd_timezone))
             # Convert end_time back to epoch time
