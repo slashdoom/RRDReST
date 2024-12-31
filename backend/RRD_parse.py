@@ -92,6 +92,7 @@ class RRD_parser:
         # replace rrdtool v key with the ds
         replace_val = "\""+ds.lower()+"\": "
         temp_result_one = re.sub("\"v\": ",  replace_val, json_result)
+        print(json.loads(temp_result_one))
         return json.loads(temp_result_one)
 
     def cleanup_payload(self, payload):
