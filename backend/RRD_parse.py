@@ -163,6 +163,8 @@ class RRD_parser:
                 r["xport"]["meta"]["legend"]["entry"]
                 )
 
+            print(master_result["data"])
+            print(r["xport"]["data"]["row"])
             for collectible in chain(
                 master_result["data"], r["xport"]["data"]["row"]
                                     ):
