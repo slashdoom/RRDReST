@@ -158,9 +158,10 @@ class RRD_parser:
                 )
 
             for collectible in chain(
-                print(collectible)
                 master_result["data"], r["xport"]["data"]["row"]
                                     ):
+                print(collectible)
+                print(collectible["t"])
                 collector[collectible["t"]].update(collectible.items())
 
         # combine objs, add row_count
