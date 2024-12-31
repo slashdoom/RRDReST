@@ -15,7 +15,7 @@ rrd_rest = FastAPI(
     "/",
     summary="Get the data from a RRD file, takes in a rrd file path"
     )
-async def get_rrd(rrd_path: str, epoch_start_time: Optional[int] = None, epoch_end_time: Optional[int] = None):
+async def get_rrd(rrd_path: str, epoch_start_time: Optional[int] = None, epoch_end_time: Optional[int] = None, rrd_timezone: Optional[str] = None):
     """
     Fetches data from an RRD file.
 
