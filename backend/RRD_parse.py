@@ -102,12 +102,15 @@ class RRD_parser:
         # convert timezones and floats
         for count, temp_obj in enumerate(payload["data"]):
             epoch_time = temp_obj["t"]
+            print("epoch_time: ", epoch_time)
             # Convert epoch time to datetime object in rrd_timezone
             rrd_datetime = datetime.datetime.fromtimestamp(int(epoch_time), pytz.timezone(self.rrd_timezone)) 
             # Convert local datetime to UTC
             utc_datetime = rrd_datetime.astimezone(pytz.utc)
             # Format UTC datetime 
-            utc_time = utc_datetime.strftime(self.time_format) 
+            utc_time = utc_datetime.strftime(self.time_format)
+            print("utc_time: ", utc_time)
+            
             payload["data"][count]["t"] = utc_time
             for key in payload["data"][count]:
                 temp_val = ""
