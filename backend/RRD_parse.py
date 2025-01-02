@@ -104,7 +104,8 @@ class RRD_parser:
             epoch_time = temp_obj["t"]
             print("epoch_time: ", epoch_time)
             # Convert epoch time to datetime object in rrd_timezone
-            rrd_datetime = datetime.datetime.fromtimestamp(int(epoch_time), pytz.timezone(self.rrd_timezone)) 
+            rrd_datetime = datetime.datetime.fromtimestamp(int(epoch_time), pytz.timezone(self.rrd_timezone))
+            print("rrd_datetime: ", rrd_datetime)
             # Convert local datetime to UTC
             utc_datetime = rrd_datetime.astimezone(pytz.utc)
             # Format UTC datetime 
