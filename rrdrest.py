@@ -17,7 +17,12 @@ rrd_rest = FastAPI(
     description="Fetches the RRD file data for the specified time range (if provided). "
                 "If epoch times are not provided, the entire data set will be fetched.",
     )
-async def get_rrd(rrd_path: str, epoch_start_time: Optional[int] = None, epoch_end_time: Optional[int] = None):
+async def get_rrd(
+    rrd_path: str,
+    epoch_start_time: Optional[int] = None,
+    epoch_end_time: Optional[int] = None,
+    time_format: Optional[str] = None,
+):
     # Check if the file exists
     if not os.path.isfile(rrd_path):
         raise HTTPException(status_code=404, detail="RRD file not found")
@@ -29,7 +34,8 @@ async def get_rrd(rrd_path: str, epoch_start_time: Optional[int] = None, epoch_e
         rr = RRD_parser(
             rrd_file=rrd_path,
             start_time=epoch_start_time,
-            end_time=epoch_end_time
+            end_time=epoch_end_time,
+            time_format=time_format
         )
         result = rr.compile_result()
         return result
