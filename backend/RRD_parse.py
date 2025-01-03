@@ -15,6 +15,7 @@ class RRD_parser:
         self.rrd_file = rrd_file
         self.ds = None
         self.step = None
+        print(epoch_output)
         if epoch_output:
             self.time_format = "%s"
         else:
@@ -87,6 +88,7 @@ class RRD_parser:
             utc_time = datetime.datetime.fromtimestamp(
                 int(epoch_time), tz=pytz.utc
             ).strftime(self.time_format)
+            print(self.time_format)
             print(utc_time)
             payload["data"][count]["t"] = utc_time
             for key in payload["data"][count]:
