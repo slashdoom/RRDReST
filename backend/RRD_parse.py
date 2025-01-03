@@ -1,10 +1,12 @@
+import datetime
+import json
+import pytz
+import re
 import subprocess
 import xmltodict
-import json
-import re
+
 from collections import defaultdict
 from itertools import chain
-import datetime
 
 
 class RRD_parser:
@@ -78,9 +80,10 @@ class RRD_parser:
         # convert timezones and floats
         for count, temp_obj in enumerate(payload["data"]):
             epoch_time = temp_obj["t"]
+            # Convert the epoch time to UTC
             utc_time = datetime.datetime.fromtimestamp(
-                int(epoch_time)
-                ).strftime(self.time_format)
+                int(epoch_time), tz=pytz.utc
+            ).strftime(self.time_format)
             payload["data"][count]["t"] = utc_time
             for key in payload["data"][count]:
                 temp_val = ""
