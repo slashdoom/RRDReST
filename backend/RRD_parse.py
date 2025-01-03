@@ -69,9 +69,9 @@ class RRD_parser:
         if self.start_time:
             rrd_xport_command = f"rrdtool xport DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime --start {self.start_time} --end {self.end_time}"
         result = subprocess.check_output(
-                                        rrd_xport_command,
-                                        shell=True
-                                        ).decode('utf-8')
+            rrd_xport_command,
+            shell=True
+        ).decode('utf-8')
         json_result = json.dumps(xmltodict.parse(result), indent=4)
         # replace rrdtool v key with the ds
         replace_val = "\""+ds.lower()+"\": "
