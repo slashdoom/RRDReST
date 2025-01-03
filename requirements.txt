@@ -2,6 +2,7 @@ fastapi==0.115.6
 gunicorn==23.0.0
 httptools==0.6.4
 pydantic==2.10.4
+pytz==2024.2
 uvicorn==0.34.0
 uvloop==0.21.0
 xmltodict==0.14.2
