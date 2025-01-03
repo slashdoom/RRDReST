@@ -11,11 +11,14 @@ from itertools import chain
 
 class RRD_parser:
 
-    def __init__(self, rrd_file=None, start_time=None, end_time=None):
+    def __init__(self, rrd_file=None, start_time=None, end_time=None, epoch_output=False):
         self.rrd_file = rrd_file
         self.ds = None
         self.step = None
-        self.time_format = "%Y-%m-%d %H:%M:%S"
+        if epoch_output:
+            self.time_format = "%s"
+        else:
+            self.time_format = "%Y-%m-%d %H:%M:%S"
         self.check_dependc()
         self.start_time = start_time
         self.end_time = end_time
