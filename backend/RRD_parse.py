@@ -9,11 +9,14 @@ import datetime
 
 class RRD_parser:
 
-    def __init__(self, rrd_file=None, start_time=None, end_time=None):
+    def __init__(self, rrd_file=None, start_time=None, end_time=None, time_format=None):
         self.rrd_file = rrd_file
         self.ds = None
         self.step = None
-        self.time_format = "%Y-%m-%d %H:%M:%S"
+        if time_format=None:
+            self.time_format = "%Y-%m-%d %H:%M:%S"
+        else:
+            self.time_format = time_format
         self.check_dependc()
         self.start_time = start_time
         self.end_time = end_time
