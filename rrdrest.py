@@ -15,7 +15,7 @@ rrd_rest = FastAPI(
     "/",
     summary="Get the data from a RRD file, takes in a rrd file path",
     description="Fetches the RRD file data for the specified time range (if provided). "
-                "If epoch times are not provided, the entire data set will be fetched.",
+                "If epoch times are not provided, the last 24 hour of data will be fetched.",
     )
 async def get_rrd(
     rrd_path: str,
