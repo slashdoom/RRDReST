@@ -25,9 +25,9 @@ class RRD_parser:
 
     def check_dependc(self):
         result = subprocess.check_output(
-                                        "rrdtool --version",
-                                        shell=True
-                                        ).decode('utf-8')
+            "rrdtool --version",
+            shell=True
+        ).decode('utf-8')
         if "RRDtool 1." not in result:
             raise Exception("RRDtool version not found, check rrdtool installed")
 
@@ -87,6 +87,7 @@ class RRD_parser:
             utc_time = datetime.datetime.fromtimestamp(
                 int(epoch_time), tz=pytz.utc
             ).strftime(self.time_format)
+            print(utc_time)
             payload["data"][count]["t"] = utc_time
             for key in payload["data"][count]:
                 temp_val = ""
