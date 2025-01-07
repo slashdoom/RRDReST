@@ -91,7 +91,7 @@ class RRD_parser:
         if self.start_time:
             ts = 0
             if self.timeshift:
-                ts = get_timeshift(self.timeshift)
+                ts = self.get_timeshift(self.timeshift)
             start_time = self.start_time - ts
             end_time = self.end_time - ts
             rrd_xport_command = f"rrdtool xport DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime --start {start_time} --end {end_time}"
@@ -114,7 +114,7 @@ class RRD_parser:
             # Convert the epoch time to UTC
             ts = 0
             if self.timeshift:
-                ts = get_timeshift(self.timeshift)
+                ts = self.get_timeshift(self.timeshift)
             utc_time = datetime.datetime.fromtimestamp(
                 int(epoch_time)+ts, tz=pytz.utc
             ).strftime(self.time_format)
