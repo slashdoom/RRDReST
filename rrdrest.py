@@ -22,6 +22,7 @@ async def get_rrd(
     epoch_start_time: Optional[int] = None,
     epoch_end_time: Optional[int] = None,
     epoch_output: Optional[bool] = False,
+    timeshift: Optional[str] = None,
 ):
     # Check if the file exists
     if not os.path.isfile(rrd_path):
@@ -35,7 +36,8 @@ async def get_rrd(
             rrd_file=rrd_path,
             start_time=epoch_start_time,
             end_time=epoch_end_time,
-            epoch_output=epoch_output
+            epoch_output=epoch_output,
+            timeshift-timeshift
         )
         result = rr.compile_result()
         return result
