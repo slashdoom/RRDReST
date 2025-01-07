@@ -80,7 +80,7 @@ class RRD_parser:
         ts_secs = 0
         for n, u in ts_pieces:
             print(n, u)
-            ts_secs += float(n) * units[u]
+            ts_secs += int(n) * units[u]
         print(ts_secs)
         return ts_secs
     
