@@ -90,8 +90,8 @@ class RRD_parser:
         rrd_xport_command = f"rrdtool xport --step {self.step} DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime"
         if self.start_time:
             ts = 0
-            if self.timeshift(self.timeshift):
-                ts = get_timeshift
+            if self.timeshift:
+                ts = get_timeshift(self.timeshift)
             start_time = self.start_time - ts
             end_time = self.end_time - ts
             rrd_xport_command = f"rrdtool xport DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime --start {start_time} --end {end_time}"
