@@ -62,12 +62,39 @@ class RRD_parser:
         self.step = STEP_VAL
         self.ds = DS_VALS
 
+    def get_timeshift(self):
+        """ gets timeshift from d/w/m/y format """
+        units = {
+            "s":1,
+            "m":60,
+            "h":3600,
+            "d":86400,
+            "w":604800,
+            "M":2628000,
+            "y":31536000,
+            "Y":31536000
+        }
+
+        ts_pieces = re.findall(r"(\d+)({0})".format("|".join(units.keys())), self.timeshift)
+        print(ts_pieces)
+        ts_secs = 0
+        for n, u in ts_pieces:
+            print(n, u)
+            ts_secs += float(n) * units[u]
+        print(ts_secs)
+        return ts_secs
+    
     def get_rrd_json(self, ds):
         """ gets RRD json from rrd tool """
         
         rrd_xport_command = f"rrdtool xport --step {self.step} DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime"
         if self.start_time:
-            rrd_xport_command = f"rrdtool xport DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime --start {self.start_time} --end {self.end_time}"
+            ts = 0
+            if self.timeshift(self.timeshift):
+                ts = get_timeshift
+            start_time = self.start_time - ts
+            end_time = self.end_time - ts
+            rrd_xport_command = f"rrdtool xport DEF:data={self.rrd_file}:{ds}:AVERAGE XPORT:data:{ds} --showtime --start {start_time} --end {end_time}"
         result = subprocess.check_output(
             rrd_xport_command,
             shell=True
@@ -85,8 +112,11 @@ class RRD_parser:
         for count, temp_obj in enumerate(payload["data"]):
             epoch_time = temp_obj["t"]
             # Convert the epoch time to UTC
+            ts = 0
+            if self.timeshift(self.timeshift):
+                ts = get_timeshift
             utc_time = datetime.datetime.fromtimestamp(
-                int(epoch_time), tz=pytz.utc
+                int(epoch_time)+ts, tz=pytz.utc
             ).strftime(self.time_format)
             payload["data"][count]["t"] = utc_time
             for key in payload["data"][count]:
