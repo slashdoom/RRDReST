@@ -113,8 +113,8 @@ class RRD_parser:
             epoch_time = temp_obj["t"]
             # Convert the epoch time to UTC
             ts = 0
-            if self.timeshift(self.timeshift):
-                ts = get_timeshift
+            if self.timeshift:
+                ts = get_timeshift(self.timeshift)
             utc_time = datetime.datetime.fromtimestamp(
                 int(epoch_time)+ts, tz=pytz.utc
             ).strftime(self.time_format)
