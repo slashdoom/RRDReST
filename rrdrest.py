@@ -37,7 +37,7 @@ async def get_rrd(
             start_time=epoch_start_time,
             end_time=epoch_end_time,
             epoch_output=epoch_output,
-            timeshift-timeshift
+            timeshift=timeshift
         )
         result = rr.compile_result()
         return result
