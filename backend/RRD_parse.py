@@ -11,7 +11,7 @@ from itertools import chain
 
 class RRD_parser:
 
-    def __init__(self, rrd_file=None, start_time=None, end_time=None, epoch_output=False):
+    def __init__(self, rrd_file=None, start_time=None, end_time=None, epoch_output=False, timeshift=None):
         self.rrd_file = rrd_file
         self.ds = None
         self.step = None
@@ -22,6 +22,7 @@ class RRD_parser:
         self.check_dependc()
         self.start_time = start_time
         self.end_time = end_time
+        self.timeshift=timeshift
 
     def check_dependc(self):
         result = subprocess.check_output(
