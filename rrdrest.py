@@ -31,15 +31,15 @@ async def get_rrd(
     if (epoch_start_time and not epoch_end_time) or (epoch_end_time and not epoch_start_time):
             raise HTTPException(status_code=400, detail="If epoch start or end time is specified both start and end time MUST be specified")
 
-    try:
-        rr = RRD_parser(
+    #try:
+    rr = RRD_parser(
             rrd_file=rrd_path,
             start_time=epoch_start_time,
             end_time=epoch_end_time,
             epoch_output=epoch_output,
             timeshift=timeshift
-        )
-        result = rr.compile_result()
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing RRD file: {e}")
+    )
+    result = rr.compile_result()
+    return result
+    #except Exception as e:
+    #    raise HTTPException(status_code=500, detail=f"Error processing RRD file: {e}")
