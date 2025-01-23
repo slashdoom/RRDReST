@@ -76,12 +76,12 @@ class RRD_parser:
         }
 
         ts_pieces = re.findall(r"(\d+)({0})".format("|".join(units.keys())), self.timeshift)
-        print(ts_pieces)
+
         ts_secs = 0
         for n, u in ts_pieces:
             print(n, u)
             ts_secs += int(n) * units[u]
-        print(ts_secs)
+
         return ts_secs
     
     def get_rrd_json(self, ds):
