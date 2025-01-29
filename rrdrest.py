@@ -23,23 +23,28 @@ async def get_rrd(
     epoch_end_time: Optional[int] = None,
     epoch_output: Optional[bool] = False,
     timeshift: Optional[str] = None,
+    baseline: Optional[str] = None,
 ):
     # Check if the file exists
     if not os.path.isfile(rrd_path):
         raise HTTPException(status_code=404, detail="RRD file not found")
 
     if (epoch_start_time and not epoch_end_time) or (epoch_end_time and not epoch_start_time):
-            raise HTTPException(status_code=400, detail="If epoch start or end time is specified both start and end time MUST be specified")
+        raise HTTPException(status_code=400, detail="If epoch start or end time is specified both start and end time MUST be specified")
 
-    #try:
-    rr = RRD_parser(
+    if (timeshift and baseline):
+        raise HTTPException(status_code=400, detail="Cannot use both timeshift and baseline")
+
+    try:
+        rr = RRD_parser(
             rrd_file=rrd_path,
             start_time=epoch_start_time,
             end_time=epoch_end_time,
             epoch_output=epoch_output,
-            timeshift=timeshift
-    )
-    result = rr.compile_result()
-    return result
-    #except Exception as e:
-    #    raise HTTPException(status_code=500, detail=f"Error processing RRD file: {e}")
+            timeshift=timeshift,
+            baseline=baseline,
+        )
+        result = rr.compile_result()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing RRD file: {e}")
