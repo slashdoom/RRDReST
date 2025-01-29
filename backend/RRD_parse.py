@@ -312,6 +312,7 @@ class RRD_parser:
         final_result = self.cleanup_payload(master_result)
         return final_result
 
+
 # if __name__ == "__main__":
 #     RRD_file = "sensor-voltage-cisco-entity-sensor-532.rrd"
 #     rr = RRD_parser(rrd_file=RRD_file)
