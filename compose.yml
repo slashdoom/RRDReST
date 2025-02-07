@@ -1,0 +1,11 @@
+name: RRDReST
+
+services:
+  rrdrest:
+    image: slashdoom/rrdrest:latest
+    container_name: rrdrest
+    volumes:
+      - "./tests:/rrd" # change to rrd path(es)
+    ports:
+      - "9000:9000"
+    restart: always
