@@ -2,11 +2,10 @@ name: RRDReST
 
 services:
   rrdrest:
-    build:
-      dockerfile: Dockerfile
+    image: slashdoom/rrdrest:latest
     container_name: rrdrest
     volumes:
-      - "./rrd:/rrd"
+      - "./tests:/rrd" # change to rrd path(es)
     ports:
       - "9000:9000"
     restart: always
