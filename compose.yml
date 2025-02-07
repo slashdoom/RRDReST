@@ -1,0 +1,12 @@
+name: RRDReST
+
+services:
+  rrdrest:
+    build:
+      dockerfile: Dockerfile
+    container_name: rrdrest
+    volumes:
+      - "./rrd:/rrd"
+    ports:
+      - "9000:9000"
+    restart: always
