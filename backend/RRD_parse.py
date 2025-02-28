@@ -11,12 +11,23 @@ from itertools import chain
 
 
 class RRD_parser:
+    _rrdtool_checked = False
 
+    @classmethod
+    def check_dependc(cls):
+        if not cls._rrdtool_checked:
+            result = subprocess.check_output("rrdtool --version", shell=True).decode('utf-8')
+            if "RRDtool 1." not in result:
+                raise Exception("RRDtool version not found, check rrdtool installed")
+            cls._rrdtool_checked = True  # Cache check
+
+    
     def __init__(self,
         rrd_file=None,
         start_time=None, end_time=None,
         epoch_output=False, timeshift=None, baseline=None
     ):
+        self.check_dependc()
         self.rrd_file = rrd_file
         self.ds = None
         self.step = None
@@ -24,20 +35,10 @@ class RRD_parser:
             self.time_format = "%s"
         else:
             self.time_format = "%Y-%m-%d %H:%M:%S"
-        self.check_dependc()
         self.start_time = start_time
         self.end_time = end_time
         self.timeshift=timeshift
         self.baseline=baseline
-
-
-    def check_dependc(self):
-        result = subprocess.check_output(
-            "rrdtool --version",
-            shell=True
-        ).decode('utf-8')
-        if "RRDtool 1." not in result:
-            raise Exception("RRDtool version not found, check rrdtool installed")
 
 
     def get_data_source(self):
