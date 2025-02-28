@@ -3,7 +3,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 from backend.RRD_parse import RRD_parser
 from fastapi import FastAPI, HTTPException
-from typing import Optional
+from typing import List, Optional
 
 rrd_rest = FastAPI(
     title="RRDReST",
