@@ -24,6 +24,33 @@ def process_file(file_path, start_time, end_time, epoch_output, timeshift, basel
     return file_path, rr.compile_result()
 
 
+# Health check endpoint
+@rrd_rest.get(
+    "/health",
+    summary="Health check",
+    description="Returns the status of the API and checks if rrdtool is available",
+    response_model=dict
+)
+async def health_check():
+    try:
+        result = await asyncio.get_running_loop().run_in_executor(
+            None,
+            lambda: subprocess.check_output("rrdtool --version", shell=True).decode('utf-8')
+        )
+        status = "healthy" if "RRDtool 1." in result else "unhealthy"
+        return {
+            "status": status,
+            "version": "0.4",
+            "rrdtool": "available" if "RRDtool 1." in result else "not available"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "version": "0.4",
+            "rrdtool": f"error: {str(e)}"
+        }
+
+
 @rrd_rest.get(
     "/",
     summary="Get the data from a RRD file, takes in a rrd file path",
