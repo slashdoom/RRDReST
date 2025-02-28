@@ -23,6 +23,7 @@ def process_file(file_path, start_time, end_time, epoch_output, timeshift, basel
     )
     return file_path, rr.compile_result()
 
+
 @rrd_rest.get(
     "/",
     summary="Get the data from a RRD file, takes in a rrd file path",
@@ -50,7 +51,11 @@ async def get_rrd(
         is_single_file = True
         files_to_process = [rrd_path]
     else:
-        files_to_process = rrd_paths
+        # Handle both repeated params and comma-separated string
+        if rrd_paths and len(rrd_paths) == 1 and "," in rrd_paths[0]:
+            files_to_process = [path.strip() for path in rrd_paths[0].split(",")]
+        else:
+            files_to_process = rrd_paths
         is_single_file = False
 
     # Check if all files exist
