@@ -47,11 +47,18 @@ async def health_check():
             "rrdtool": "available" if "RRDtool 1." in result else "not available"
         }
     except Exception as e:
-        return {
-            "status": "unhealthy",
-            "version": "0.4",
-            "rrdtool": f"error: {str(e)}"
-        }
+        # If it’s already an HTTPException, re-raise it
+        if isinstance(e, HTTPException):
+            raise e
+        # Otherwise, raise a new 503 exception
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "unhealthy",
+                "version": "0.4",
+                "rrdtool": f"error: {str(e)}"
+            }
+        )
 
 # RRD Data endpoint
 @rrd_rest.get(
