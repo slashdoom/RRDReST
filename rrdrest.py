@@ -4,7 +4,7 @@ import subprocess
 
 from concurrent.futures import ThreadPoolExecutor
 from backend.RRD_parse import RRD_parser
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from typing import List, Optional
 
 rrd_rest = FastAPI(
@@ -76,7 +76,7 @@ async def health_check():
     )
 async def get_rrd(
     rrd_path: Optional[str] = None,
-    rrd_paths: Optional[List[str]] = None,
+    rrd_paths: Optional[List[str]] = Query(None),
     epoch_start_time: Optional[int] = None,
     epoch_end_time: Optional[int] = None,
     epoch_output: Optional[bool] = False,
