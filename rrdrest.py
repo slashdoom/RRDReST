@@ -36,26 +36,33 @@ def process_file(file_path, start_time, end_time, epoch_output, timeshift, basel
 )
 async def health_check():
     try:
+        # Check rrdtool availability
         result = await asyncio.get_running_loop().run_in_executor(
             None,
             lambda: subprocess.check_output("rrdtool --version", shell=True).decode('utf-8')
         )
-        status = "healthy" if "RRDtool 1." in result else "unhealthy"
+        if "RRDtool 1." not in result:
+            raise HTTPException(
+                status_code=503,
+                detail={
+                    "status": "unhealthy",
+                    "version": rrd_rest.version,
+                    "rrdtool": "not available"
+                }
+            )
         return {
-            "status": status,
-            "version": "0.4",
-            "rrdtool": "available" if "RRDtool 1." in result else "not available"
+            "status": "healthy",
+            "version": rrd_rest.version,
+            "rrdtool": "available"
         }
     except Exception as e:
-        # If it’s already an HTTPException, re-raise it
         if isinstance(e, HTTPException):
             raise e
-        # Otherwise, raise a new 503 exception
         raise HTTPException(
             status_code=503,
             detail={
                 "status": "unhealthy",
-                "version": "0.4",
+                "version": rrd_rest.version,
                 "rrdtool": f"error: {str(e)}"
             }
         )
