@@ -1,5 +1,6 @@
 import os
 
+from concurrent.futures import ThreadPoolExecutor
 from backend.RRD_parse import RRD_parser
 from fastapi import FastAPI, HTTPException
 from typing import Optional
@@ -10,6 +11,17 @@ rrd_rest = FastAPI(
     version="0.4",
 )
 
+# Sync/Async helper function
+def process_file(file_path, start_time, end_time, epoch_output, timeshift, baseline):
+    rr = RRD_parser(
+        rrd_file=file_path,
+        start_time=start_time,
+        end_time=end_time,
+        epoch_output=epoch_output,
+        timeshift=timeshift,
+        baseline=baseline,
+    )
+    return file_path, rr.compile_result()
 
 @rrd_rest.get(
     "/",
@@ -54,29 +66,39 @@ async def get_rrd(
 
     try:
         if is_single_file:
-            # Single file mode: process and return directly
-            rr = RRD_parser(
-                rrd_file=rrd_path,
-                start_time=epoch_start_time,
-                end_time=epoch_end_time,
-                epoch_output=epoch_output,
-                timeshift=timeshift,
-                baseline=baseline,
+            # Single file mode: process synchronously in thread and return directly
+            loop = asyncio.get_running_loop()
+            _, result = await loop.run_in_executor(
+                None,  # Use default ThreadPoolExecutor
+                process_file,
+                rrd_path,
+                epoch_start_time,
+                epoch_end_time,
+                epoch_output,
+                timeshift,
+                baseline
             )
-            return rr.compile_result()
+            return result
         else:
-            # Multiple file mode: process and return dictionary
-            results = {}
-            for file_path in files_to_process:
-                rr = RRD_parser(
-                    rrd_file=file_path,
-                    start_time=epoch_start_time,
-                    end_time=epoch_end_time,
-                    epoch_output=epoch_output,
-                    timeshift=timeshift,
-                    baseline=baseline,
-                )
-                results[file_path] = rr.compile_result()
+            # Multiple file mode: process concurrently and return dictionary
+            loop = asyncio.get_running_loop()
+            tasks = []
+            with ThreadPoolExecutor() as executor:
+                for file_path in files_to_process:
+                    tasks.append(
+                        loop.run_in_executor(
+                            executor,
+                            process_file,
+                            file_path,
+                            epoch_start_time,
+                            epoch_end_time,
+                            epoch_output,
+                            timeshift,
+                            baseline
+                        )
+                    )
+                results_list = await asyncio.gather(*tasks)
+            results = {file_key: result for file_key, result in results_list}
             return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing RRD file(s): {e}")
