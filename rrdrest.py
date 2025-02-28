@@ -11,6 +11,7 @@ rrd_rest = FastAPI(
     version="0.4",
 )
 
+
 # Sync/Async helper function
 def process_file(file_path, start_time, end_time, epoch_output, timeshift, baseline):
     rr = RRD_parser(
@@ -50,7 +51,7 @@ async def health_check():
             "rrdtool": f"error: {str(e)}"
         }
 
-
+# RRD Data endpoint
 @rrd_rest.get(
     "/",
     summary="Get the data from a RRD file, takes in a rrd file path",
