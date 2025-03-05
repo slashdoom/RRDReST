@@ -95,11 +95,36 @@ async def get_rrd(
         is_single_file = True
         files_to_process = [rrd_path]
     else:
-        # Handle both repeated params and comma-separated string
+        # Handle both repeated params and comma-separated string, with optional aliases
         if rrd_paths and len(rrd_paths) == 1 and "," in rrd_paths[0]:
-            files_to_process = [path.strip() for path in rrd_paths[0].split(",")]
+            # Comma-separated format: path1,path2:alias1,alias2
+            entry = rrd_paths[0].strip()
+            if ":" in entry:
+                paths_part, aliases_part = entry.split(":", 1)
+                paths = [p.strip() for p in paths_part.split(",")]
+                alias_list = [a.strip() for a in aliases_part.split(",")]
+                if len(paths) != len(alias_list):
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Number of paths and aliases must match in 'rrd_paths'"
+                    )
+                files_to_process = paths
+                aliases = dict(zip(paths, alias_list))
+            else:
+                # No aliases provided, just paths
+                files_to_process = [p.strip() for p in entry.split(",")]
+                aliases = {p: p for p in files_to_process}
         else:
-            files_to_process = rrd_paths
+            # Repeated param format: rrd_paths=path1:alias1&rrd_paths=path2:alias2
+            for entry in rrd_paths:
+                if ":" in entry:
+                    path, alias = entry.split(":", 1)
+                    files_to_process.append(path.strip())
+                    aliases[path.strip()] = alias.strip()
+                else:
+                    path = entry.strip()
+                    files_to_process.append(path)
+                    aliases[path] = path
         is_single_file = False
 
     # Check if all files exist
@@ -147,7 +172,8 @@ async def get_rrd(
                         )
                     )
                 results_list = await asyncio.gather(*tasks)
-            results = {file_key: result for file_key, result in results_list}
+            # Use aliases as keys if provided, otherwise use file paths
+            results = {aliases[file_key]: result for file_key, result in results_list}
             return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing RRD file(s): {e}")
